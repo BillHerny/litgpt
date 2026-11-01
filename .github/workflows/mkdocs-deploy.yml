@@ -1,0 +1,38 @@
+name: Deploy MkDocs
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      # Step 1: Checkout the repository
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Step 2: Install uv
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          activate-environment: true
+          python-version: "3.10"
+          enable-cache: true
+
+      # Step 3: Install MkDocs and dependencies
+      - run: uv pip install mkdocs mkdocs-material mkdocs-pagetree-plugin
+
+      # Step 4: Deploy to GitHub Pages
+      - run: |
+          mkdir -p gh-pages/docs
+          cp -r tutorials/* gh-pages/docs
+          cd gh-pages
+          mv docs/mkdocs.yml mkdocs.yml
+          echo "{{ pagetree }}" > docs/index.md
+          mkdocs gh-deploy --force
+
+      - name: Minimize uv cache
+        run: uv cache prune --ci

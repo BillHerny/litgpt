@@ -1,0 +1,48 @@
+checkpoint_dir: checkpoints/Qwen/Qwen2.5-1.5B
+out_dir: out/qwen2.5-1.5b-qlora
+precision: 32-true
+devices: 2
+num_nodes: 1
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_query: true
+lora_key: false
+lora_value: true
+lora_projection: false
+lora_mlp: false
+lora_head: false
+data:
+  class_path: litgpt.data.Alpaca2k
+  init_args:
+    mask_prompt: false
+    val_split_fraction: 0.05
+    prompt_style: alpaca
+    ignore_index: -100
+    seed: 42
+    num_workers: 4
+    download_dir: data/alpaca2k
+    file_url: https://raw.githubusercontent.com/tloen/alpaca-lora/main/alpaca_data_cleaned_archive.json
+    file_name: alpaca2k_data_cleaned_archive.json
+    repo_id: mhenrichsen/alpaca_2k_test
+train:
+  save_interval: 100
+  log_interval: 1
+  global_batch_size: 8
+  micro_batch_size: 1
+  lr_warmup_steps: 100
+  epochs: 1
+  min_lr: 6.0e-05
+log:
+  log_model: false
+  save_logs: true
+eval:
+  interval: 10000
+  max_new_tokens: 100
+  max_iters: 100
+  initial_validation: false
+  final_validation: true
+  evaluate_example: first
+optimizer: AdamW
+logger_name: csv
+seed: 1337
